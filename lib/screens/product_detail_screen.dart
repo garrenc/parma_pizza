@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:parma_pizza/widgets/button.dart';
 import '../providers/cart.dart';
 import 'package:provider/provider.dart';
 
@@ -25,7 +26,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       context,
       listen: false,
     ).findById(productId);
-
+    final height = MediaQuery.of(context).size.height;
     final cart = Provider.of<Cart>(context, listen: false);
     return Scaffold(
       backgroundColor: Colors.white,
@@ -39,11 +40,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             Padding(
               padding: const EdgeInsets.only(top: 8.0),
               child: Container(
-                height: 300,
+                height: height / 2.5,
                 width: double.infinity,
                 child: Image.network(
                   loadedProduct.imageUrl,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.fill,
                 ),
               ),
             ),
@@ -69,41 +70,37 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 textAlign: TextAlign.center,
                 softWrap: true,
               ),
-            )
+            ),
+            ButtonApp(
+              'В корзину за ${loadedProduct.price.toStringAsFixed(0)} ₽',
+              () {
+                cart.addItem(loadedProduct.id, loadedProduct.price,
+                    loadedProduct.title, loadedProduct.imageUrl);
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      'Предмет добавлен в корзину!',
+                    ),
+                    duration: Duration(seconds: 3),
+                    action: SnackBarAction(
+                      label: 'КОРЗИНА',
+                      onPressed: () {
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => TabsScreen(2)),
+                          (Route<dynamic> route) => false,
+                        );
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        label: Text(
-          'В корзину за ${loadedProduct.price.toStringAsFixed(0)} ₽',
-          style: TextStyle(
-              fontSize: 18, fontFamily: 'Comic Sans', color: Colors.white),
-        ),
-        onPressed: () {
-          cart.addItem(loadedProduct.id, loadedProduct.price,
-              loadedProduct.title, loadedProduct.imageUrl);
-          ScaffoldMessenger.of(context).hideCurrentSnackBar();
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Предмет добавлен в корзину!',
-              ),
-              duration: Duration(seconds: 3),
-              action: SnackBarAction(
-                label: 'КОРЗИНА',
-                onPressed: () {
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (context) => TabsScreen(2)),
-                    (Route<dynamic> route) => false,
-                  );
-                },
-              ),
-            ),
-          );
-        },
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }

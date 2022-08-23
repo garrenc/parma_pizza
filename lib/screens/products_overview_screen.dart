@@ -1,6 +1,5 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
+import 'package:parma_pizza/screens/search_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:sticky_headers/sticky_headers/widget.dart';
@@ -21,23 +20,8 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   List<bool> isSelected = [
     false,
     false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
   ];
-  List<String> categories = [
-    'Парма',
-    'Кальцоне',
-    'Блины',
-    'Сырники',
-    'Пельмени',
-    'Вареники',
-    'Пирожки',
-    'Суп'
-  ];
+  List<String> categories = [];
 
   @override
   void initState() {
@@ -48,9 +32,11 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
     super.initState();
   }
 
+
   @override
   void didChangeDependencies() {
     Provider.of<Products>(context, listen: false).fetchAndSetProducts();
+    Provider.of<Products>(context, listen: false).fetchAndSetCategories();
     super.didChangeDependencies();
   }
 
@@ -58,11 +44,23 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   Widget build(BuildContext context) {
     final itemsData = Provider.of<Products>(context);
     final items = itemsData.items;
+    final categoriesData = itemsData.categories;
+    categories = categoriesData;
     return Scaffold(
       appBar: AppBar(
         title: Text('Меню'),
         elevation: 0,
         backgroundColor: Colors.white,
+        actions: [
+          IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SearchScreen()),
+                );
+              },
+              icon: Icon(Icons.search))
+        ],
       ),
       backgroundColor: Colors.white,
       body: ListView(
@@ -73,10 +71,6 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
           StickyHeader(
             header: Column(
               children: [
-                Container(
-                  height: 9,
-                  color: Colors.white,
-                ),
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
@@ -91,18 +85,10 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
                   height: 32,
                   child: Container(
                     height: 32,
-                    child: ListView(
+                    child: ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      children: [
-                        categoriesButton(0, 0),
-                        categoriesButton(1, 10),
-                        categoriesButton(2, 22),
-                        categoriesButton(3, 25),
-                        categoriesButton(4, 26),
-                        categoriesButton(5, 28),
-                        categoriesButton(6, 32),
-                        categoriesButton(7, 33),
-                      ],
+                      itemBuilder: (ctx, i) => categoriesButton(categories[i]),
+                      itemCount: categories.length,
                     ),
                   ),
                 ),
@@ -155,60 +141,7 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
     );
   }
 
-  Future _scrollToIndex(int index) async {
-    await controller.scrollToIndex(index - 1,
-        preferPosition: AutoScrollPosition.begin);
-  }
-
-  Widget categoriesButton(int index, int scrollIndex) {
-    return GestureDetector(
-      onTap: () {
-        _scrollToIndex(scrollIndex);
-        setState(
-          () {
-            for (int indexBtn = 0; indexBtn < isSelected.length; indexBtn++) {
-              if (indexBtn == index) {
-                isSelected[indexBtn] = true;
-                Timer(Duration(milliseconds: 200), () {
-                  setState(() {
-                    isSelected[indexBtn] = false;
-                  });
-                });
-              } else {
-                isSelected[indexBtn] = false;
-              }
-            }
-          },
-        );
-      },
-      child: Container(
-        height: 33,
-        padding: EdgeInsets.only(left: 15),
-        child: Container(
-          alignment: Alignment.center,
-          height: 8.0,
-          width: 95.0,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20.0),
-            color: isSelected[index]
-                ? Colors.orange.shade200
-                : Colors.grey.shade300,
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                categories[index],
-                style: TextStyle(
-                  color:
-                      isSelected[index] ? Colors.orange.shade700 : Colors.black,
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
-    );
+  Widget categoriesButton(String category) {
+   return (Container(margin: const EdgeInsets.all(4), child: Text(category), color: Colors.orange,));
   }
 }

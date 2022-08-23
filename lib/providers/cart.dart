@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
@@ -121,7 +119,7 @@ class Cart with ChangeNotifier {
     notifyListeners();
   }
 
-  void sendOrder(
+  Future<void> sendOrder(
     String platform,
     String items,
     String name,
@@ -130,27 +128,27 @@ class Cart with ChangeNotifier {
     String appart,
     String phone,
     String delivery,
-    String deliveryTime,
     String payment,
-  ) {
-    const url = 'http://2121707.ru/ireg.php';
+  ) async {
+    const url = 'https://parmapizza.ru/ireg.php';
+
     try {
-      http.post(Uri.parse(url),
-          body: json.encode({
-            'platform': platform,
-            'items': items,
-            'name': name,
-            'street': street,
-            'build': build,
-            'appart': appart,
-            'phone': phone,
-            'delivery': delivery,
-            'delivery_time': deliveryTime,
-            'payment': payment,
-          }));
-      print(platform);
+      await http.post(
+        Uri.parse(url),
+        body: {
+          "platform": platform,
+          "items": items,
+          "name": name,
+          "street": street,
+          "build": build,
+          "appart": appart,
+          "phone": phone,
+          "delivery": delivery,
+          "payment": payment,
+        },
+      );
+      print("Заказ успешно отправлен");
       print(items);
-      print(deliveryTime);
     } catch (e) {
       print(e);
     }

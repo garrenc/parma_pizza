@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:parma_pizza/widgets/button.dart';
 import 'package:provider/provider.dart';
 
 import '../screens/confirm_order_screen.dart';
@@ -78,24 +79,19 @@ class CartScreen extends StatelessWidget {
                       cart.items.values.toList()[i].title,
                     ),
                   ),
-                )
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: ButtonApp(
+                    'Оформить заказ',
+                    () {
+                      Navigator.of(context)
+                          .pushNamed(ConfirmOrderScreen.routeName);
+                    },
+                  ),
+                ),
               ],
             ),
-      floatingActionButton: cart.items.isEmpty
-          ? null
-          : FloatingActionButton.extended(
-              label: Text(
-                'Оформить заказ',
-                style: TextStyle(
-                    fontSize: 18,
-                    fontFamily: 'Comic Sans',
-                    color: Colors.white),
-              ),
-              onPressed: () {
-                Navigator.of(context).pushNamed(ConfirmOrderScreen.routeName);
-              },
-            ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }

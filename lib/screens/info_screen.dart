@@ -5,6 +5,7 @@ class InfoScreen extends StatelessWidget {
   static const routeName = '/info';
   @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
@@ -12,7 +13,7 @@ class InfoScreen extends StatelessWidget {
           backgroundColor: Colors.white,
         ),
         body: Padding(
-          padding: const EdgeInsets.only(top: 50),
+          padding: EdgeInsets.only(top: height / 20),
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -22,7 +23,7 @@ class InfoScreen extends StatelessWidget {
                   child: Image.asset('assets/images/logo.jpg'),
                 ),
                 SizedBox(
-                  height: 50,
+                  height: height / 14,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -36,7 +37,7 @@ class InfoScreen extends StatelessWidget {
                       ),
                     ),
                     GestureDetector(
-                      onTap: () => launch('tel:2700612'),
+                      onTap: () => launchUrl(Uri.parse('tel:2700612')),
                       child: Text(
                         '2-700-612',
                         textAlign: TextAlign.start,
@@ -49,11 +50,11 @@ class InfoScreen extends StatelessWidget {
                   ],
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(top: 220),
+                  padding: EdgeInsets.only(top: height / 3),
                   child: Align(
                     alignment: Alignment.bottomCenter,
                     child: Text(
-                      'Доставка осуществляется с ул. Газеты Звезда, 5. \n'
+                      'Доставка осуществляется с ул. Куйбышева, 67. \n'
                       'от 0км - до 10км стоимость доставки 150р. \n'
                       'от 10км до 15км стоимость доставки 250р.',
                       textAlign: TextAlign.center,

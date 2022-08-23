@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:map_launcher/map_launcher.dart';
 import 'package:provider/provider.dart';
 
 import '../screens/tabs_screen.dart';
@@ -20,30 +21,29 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
 
   String _phoneNumber;
 
-  String _street;
+  String _street = "";
 
-  String _house;
+  String _house = "";
 
-  String _apartment;
+  String _apartment = "";
 
   var _deliveryOptions = ['Самовывоз', 'Доставка домой'];
 
-  var _paymentOptions = ['Наличными', 'Картой курьеру'];
+  var _paymentOptions = ['Наличными', 'Картой'];
+
+  void _launchMap() async {
+    final availableMaps = await MapLauncher.installedMaps;
+    await availableMaps.first.showMarker(
+      coords: Coords(57.99795604365832, 56.24277818818254),
+      title: "Парма пицца",
+      description: 'Кубышева 67',
+    );
+  }
 
   TimeOfDay picked;
 
   String payment;
   String delivery;
-
-  Future<Null> selectTime(BuildContext context) async {
-    picked = await showTimePicker(
-      helpText: 'Выберите время',
-      context: context,
-      initialTime: TimeOfDay.now(),
-    );
-    print(MaterialLocalizations.of(context)
-        .formatTimeOfDay(picked, alwaysUse24HourFormat: true));
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +75,9 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
               ),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Телефон'),
-                textInputAction: TextInputAction.next,
+                textInputAction: delivery == 'Самовывоз'
+                    ? TextInputAction.done
+                    : TextInputAction.next,
                 keyboardType: TextInputType.phone,
                 onSaved: (value) {
                   _phoneNumber = value;
@@ -93,12 +95,14 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                 onSaved: (value) {
                   _street = value;
                 },
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Введите улицу!';
-                  }
-                  return null;
-                },
+                validator: delivery == 'Самовывоз'
+                    ? null
+                    : (value) {
+                        if (value.isEmpty) {
+                          return 'Введите улицу!';
+                        }
+                        return null;
+                      },
               ),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Дом'),
@@ -106,24 +110,28 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                 onSaved: (value) {
                   _house = value;
                 },
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Введите номер дома!';
-                  }
-                  return null;
-                },
+                validator: delivery == 'Самовывоз'
+                    ? null
+                    : (value) {
+                        if (value.isEmpty) {
+                          return 'Введите номер дома!';
+                        }
+                        return null;
+                      },
               ),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Квартира'),
                 onSaved: (value) {
                   _apartment = value;
                 },
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Введите номер квартиры!';
-                  }
-                  return null;
-                },
+                validator: delivery == 'Самовывоз'
+                    ? null
+                    : (value) {
+                        if (value.isEmpty) {
+                          return 'Введите номер квартиры!';
+                        }
+                        return null;
+                      },
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10),
@@ -145,7 +153,7 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                   }).toList(),
                   validator: (value) {
                     if (value == null) {
-                      return 'Укажите способ оплаты!';
+                      return 'Укажите способ доставки!';
                     }
                     return null;
                   },
@@ -174,10 +182,6 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                   return null;
                 },
               ),
-              TextButton(
-                  onPressed: () => selectTime(context),
-                  child: Text(
-                      'Выбрать время ${delivery != null && delivery == 'Самовывоз' ? 'самовывоза' : 'доставки'}')),
               SizedBox(
                 height: 20,
               ),
@@ -199,7 +203,7 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                           return;
                         }
                         _form.currentState.save();
-                        String items = '';
+                        String items = "";
                         for (int i = 0; i < cart.items.length; i++) {
                           items += cart.items.values.toList()[i].productId +
                               '-' +
@@ -219,10 +223,6 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                             _apartment,
                             _phoneNumber,
                             delivery,
-                            MaterialLocalizations.of(context)
-                                .formatTimeOfDay(picked,
-                                    alwaysUse24HourFormat: true)
-                                .toString(),
                             payment);
                         ScaffoldMessenger.of(context).hideCurrentSnackBar();
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -233,12 +233,18 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
                             duration: Duration(seconds: 5),
                           ),
                         );
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => TabsScreen(0)),
-                          (Route<dynamic> route) => false,
-                        );
+                        if (delivery == 'Доставка домой') {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => TabsScreen(0)),
+                            (Route<dynamic> route) => false,
+                          );
+                        }
+
+                        if (delivery == 'Самовывоз') {
+                          showAlertDialog(context);
+                        }
                         cart.clear();
                       },
                       child: Padding(
@@ -259,6 +265,53 @@ class _ConfirmOrderScreenState extends State<ConfirmOrderScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  showAlertDialog(BuildContext context) {
+    // set up the buttons
+    Widget cancelButton = TextButton(
+      child: Text("Отменить"),
+      onPressed: () {
+        Navigator.pop(context);
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => TabsScreen(0)),
+          (Route<dynamic> route) => false,
+        );
+      },
+    );
+    Widget continueButton = TextButton(
+      child: Text("Открыть"),
+      onPressed: () {
+        _launchMap();
+        Navigator.pop(context);
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => TabsScreen(0)),
+          (Route<dynamic> route) => false,
+        );
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Проложить маршрут"),
+      content: Text(
+        "Хотите открыть карты для проложения маршрута?",
+      ),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
     );
   }
 }
