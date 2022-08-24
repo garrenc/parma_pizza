@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
           builder: (context, child) => MediaQuery(
               data:
-                  MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+                  MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true, textScaleFactor:1.0 ),
               child: child),
           title: 'MyShop',
           theme: ThemeData(
