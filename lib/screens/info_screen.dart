@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:parma_pizza/widgets/info_alert_box.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class InfoScreen extends StatelessWidget {
@@ -50,15 +51,19 @@ class InfoScreen extends StatelessWidget {
                   ],
                 ),
                 Padding(
-                  padding: EdgeInsets.only(top: height / 3),
-                  child: Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Text(
-                      'Доставка осуществляется с ул. Куйбышева, 67. \n'
-                      'от 0км - до 10км стоимость доставки 150р. \n'
-                      'от 10км до 15км стоимость доставки 250р.',
-                      textAlign: TextAlign.center,
-                    ),
+                  padding: EdgeInsets.only(top: height / 5),
+                  child: TextButton(child: Text('Условия Доставки' ,style: TextStyle(color: Colors.black),), onPressed: ()=>showDialog(context: context, builder: (ctx)=>
+                      InfoAlertBox(
+                    text:'-От 0 - до 5 км минимальная сумма заказа - 600 ₽\n'
+                          '-От 5 - до 8 км минимальная сумма заказа - 700 ₽\n'
+                          '-От 8 - до 10 км минимальная сумма заказа - 1000 ₽\n'
+                          '-От 10 - до 15 км минимальная сумма заказа - 1500 ₽\n'
+                          '-От 15 - 20 км доставка осуществляется платно 350₽ - при минимальной сумме заказа 2500₽. (На меньшую сумму доставка не осуществляется)\n'
+                          '-От 20 км - доставка не осуществляется\n\n'
+                            '*Обратите внимание, за заказ в на сумму свыше 6000₽ взымается предоплата 50% от стоимости заказа.\n',
+                    title: 'Условия Доставки',
+                  ),
+                  ),
                   ),
                 )
               ],

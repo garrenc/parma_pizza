@@ -7,7 +7,7 @@ import './product.dart';
 
 class Products with ChangeNotifier {
   List<Product> _items = [];
-  List<String> _categories = [];
+  List<Map<String, dynamic>> _categories = [];
   static const url = 'https://parmapizza.ru/parmajson.php';
   Future<void> fetchAndSetProducts() async {
     final response = await http.get(Uri.parse(url));
@@ -44,22 +44,34 @@ class Products with ChangeNotifier {
   }
 
   Future<void> fetchAndSetCategories() async {
+    try {
     final response = await http.get(Uri.parse(url));
     final extractedDataMap =
-     await json.decode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
-    final List<String> loadedCategories = [];
+    await json.decode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+    List<Map<String, dynamic>> categories = [];
+    Map<String, dynamic> loadedCategories = {};
     final categoryData = extractedDataMap['site']['group'];
+    int i = 0;
     for (var item in categoryData){
-      loadedCategories.add(item['@attributes']['name']);
+      loadedCategories["name"] = (item['@attributes']['name']);
+      loadedCategories["itemsLength"] = item["item"].length;
+      categories.isEmpty ? loadedCategories["scrollIndex"] = 0 :
+      loadedCategories["scrollIndex"] = categories[i-1]["itemsLength"];
+      categories.add(loadedCategories);
+      loadedCategories = {};
+      i++;
     }
-    _categories = loadedCategories;
+    _categories = categories;}
+    catch(e){
+      print(e);
+    }
 }
 
   List<Product> get items {
     return [..._items];
   }
 
-  List<String> get categories {
+  List<Map<String,dynamic>> get categories {
     return [..._categories];
   }
 

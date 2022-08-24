@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:parma_pizza/screens/search_screen.dart';
 import 'package:provider/provider.dart';
@@ -21,31 +23,29 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
     false,
     false,
   ];
-  List<String> categories = [];
+  List<Map<String,dynamic>> categories = [];
 
   @override
   void initState() {
     controller = AutoScrollController(
         viewportBoundaryGetter: () =>
-            Rect.fromLTRB(0, 0, 0, MediaQuery.of(context).padding.bottom),
+            Rect.fromLTRB(0,50, 0, MediaQuery.of(context).padding.bottom),
         axis: scrollDirection);
     super.initState();
   }
 
-
   @override
   void didChangeDependencies() {
-    Provider.of<Products>(context, listen: false).fetchAndSetProducts();
-    Provider.of<Products>(context, listen: false).fetchAndSetCategories();
     super.didChangeDependencies();
   }
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<Products>(context, listen: false).fetchAndSetCategories();
+    Provider.of<Products>(context, listen: false).fetchAndSetProducts();
     final itemsData = Provider.of<Products>(context);
     final items = itemsData.items;
-    final categoriesData = itemsData.categories;
-    categories = categoriesData;
+    categories = itemsData.categories;
     return Scaffold(
       appBar: AppBar(
         title: Text('Меню'),
@@ -83,15 +83,15 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
                     ],
                   ),
                   height: 32,
-                  child: Container(
-                    height: 32,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (ctx, i) => categoriesButton(categories[i]),
-                      itemCount: categories.length,
+                    child: Container(
+                      height: 32,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (ctx, i) => categoriesButton(categories[i]["scrollIndex"] , i),
+                        itemCount: categories.length,
+                      ),
                     ),
                   ),
-                ),
                 Container(
                   height: 15,
                   color: Colors.white,
@@ -141,7 +141,60 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
     );
   }
 
-  Widget categoriesButton(String category) {
-   return (Container(margin: const EdgeInsets.all(4), child: Text(category), color: Colors.orange,));
+  Future _scrollToIndex(int index) async {
+    await controller.scrollToIndex(index  ,
+        preferPosition: AutoScrollPosition.begin);
+  }
+  String capitalize(String s) {
+    return "${s[0].toUpperCase()}${s.substring(1).toLowerCase()}";
+  }
+
+  Widget categoriesButton(int scrollIndex, int index) {
+    return GestureDetector(
+      onTap: () {
+        _scrollToIndex(scrollIndex);
+        setState(
+              () {
+            for (int indexBtn = 0; indexBtn < isSelected.length; indexBtn++) {
+              if (indexBtn == index) {
+                isSelected[indexBtn] = true;
+                Timer(Duration(milliseconds: 200), () {
+                  setState(() {
+                    isSelected[indexBtn] = false;
+                  });
+                });
+              } else {
+                isSelected[indexBtn] = false;
+              }
+            }
+          },
+        );
+      },
+      child: Container(
+        height: 33,
+        padding: EdgeInsets.only(left: 15),
+        child: Container(
+          alignment: Alignment.center,
+          height: 8.0,
+          width: 150,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20.0),
+            color: isSelected[index]
+                ? Colors.orange.shade200
+                : Colors.grey.shade300,
+          ),
+          child: Text(
+                capitalize(categories[index]["name"]),
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  color:
+                  isSelected[index] ? Colors.orange.shade700 : Colors.black,
+                ),
+              )
+
+          ),
+        ),
+
+    );
   }
 }
