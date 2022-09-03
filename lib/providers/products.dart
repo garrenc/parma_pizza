@@ -51,15 +51,13 @@ class Products with ChangeNotifier {
     List<Map<String, dynamic>> categories = [];
     Map<String, dynamic> loadedCategories = {};
     final categoryData = extractedDataMap['site']['group'];
-    int i = 0;
+    int scrollLength = 0;
     for (var item in categoryData){
       loadedCategories["name"] = (item['@attributes']['name']);
-      loadedCategories["itemsLength"] = item["item"].length;
-      categories.isEmpty ? loadedCategories["scrollIndex"] = 0 :
-      loadedCategories["scrollIndex"] = categories[i-1]["itemsLength"];
+      loadedCategories["scrollIndex"] = scrollLength;
+      scrollLength += item["item"].length;
       categories.add(loadedCategories);
       loadedCategories = {};
-      i++;
     }
     _categories = categories;}
     catch(e){

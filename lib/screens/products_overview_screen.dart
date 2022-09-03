@@ -19,17 +19,14 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   final scrollDirection = Axis.vertical;
   AutoScrollController controller;
 
-  List<bool> isSelected = [
-    false,
-    false,
-  ];
-  List<Map<String,dynamic>> categories = [];
+  List<bool> isSelected = [];
+  List<Map<String, dynamic>> categories = [];
 
   @override
   void initState() {
     controller = AutoScrollController(
         viewportBoundaryGetter: () =>
-            Rect.fromLTRB(0,50, 0, MediaQuery.of(context).padding.bottom),
+            Rect.fromLTRB(0, 50, 0, MediaQuery.of(context).padding.bottom),
         axis: scrollDirection);
     super.initState();
   }
@@ -46,6 +43,9 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
     final itemsData = Provider.of<Products>(context);
     final items = itemsData.items;
     categories = itemsData.categories;
+    for (var item in categories) {
+      isSelected.add(false);
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text('Меню'),
@@ -83,15 +83,16 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
                     ],
                   ),
                   height: 32,
-                    child: Container(
-                      height: 32,
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (ctx, i) => categoriesButton(categories[i]["scrollIndex"] , i),
-                        itemCount: categories.length,
-                      ),
+                  child: Container(
+                    height: 32,
+                    child: ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (ctx, i) =>
+                          categoriesButton(categories[i]["scrollIndex"], i),
+                      itemCount: categories.length,
                     ),
                   ),
+                ),
                 Container(
                   height: 15,
                   color: Colors.white,
@@ -142,9 +143,10 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   }
 
   Future _scrollToIndex(int index) async {
-    await controller.scrollToIndex(index  ,
+    await controller.scrollToIndex(index,
         preferPosition: AutoScrollPosition.begin);
   }
+
   String capitalize(String s) {
     return "${s[0].toUpperCase()}${s.substring(1).toLowerCase()}";
   }
@@ -154,7 +156,7 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
       onTap: () {
         _scrollToIndex(scrollIndex);
         setState(
-              () {
+          () {
             for (int indexBtn = 0; indexBtn < isSelected.length; indexBtn++) {
               if (indexBtn == index) {
                 isSelected[indexBtn] = true;
@@ -174,27 +176,24 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
         height: 33,
         padding: EdgeInsets.only(left: 15),
         child: Container(
-          alignment: Alignment.center,
-          height: 8.0,
-          width: 150,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20.0),
-            color: isSelected[index]
-                ? Colors.orange.shade200
-                : Colors.grey.shade300,
-          ),
-          child: Text(
-                capitalize(categories[index]["name"]),
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color:
-                  isSelected[index] ? Colors.orange.shade700 : Colors.black,
-                ),
-              )
-
-          ),
-        ),
-
+            alignment: Alignment.center,
+            height: 8.0,
+            width: 150,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20.0),
+              color: isSelected[index]
+                  ? Colors.orange.shade200
+                  : Colors.grey.shade300,
+            ),
+            child: Text(
+              capitalize(categories[index]["name"]),
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color:
+                    isSelected[index] ? Colors.orange.shade700 : Colors.black,
+              ),
+            )),
+      ),
     );
   }
 }
