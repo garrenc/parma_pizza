@@ -9,12 +9,11 @@ class Product with ChangeNotifier {
   final String weight;
 
   Product({
-    this.weight,
-    @required this.id,
-    @required this.title,
-    @required this.description,
-    @required this.price,
-    @required this.imageUrl,
+    required this.weight,
+    required this.id,
+    required this.title,
+    required this.description,
+    required this.price,
+    required this.imageUrl,
   });
-
 }

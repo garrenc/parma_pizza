@@ -1,32 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:parma_pizza/providers/product.dart';
 
 import '../screens/product_detail_screen.dart';
 
 class ProductItem extends StatelessWidget {
-  final String id;
-  final String title;
-  final String imageUrl;
-  final int price;
-  final String description;
+  final Product product;
 
-  ProductItem({
-    @required this.id,
-    @required this.title,
-    @required this.imageUrl,
-    @required this.price,
-    @required this.description,
+  const ProductItem({
+    super.key,
+    required this.product,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(
         children: [
           GestureDetector(
             onTap: () {
-              Navigator.of(context)
-                  .pushNamed(ProductDetailScreen.routeName, arguments: id);
+              Navigator.push(context, MaterialPageRoute(builder: (ctx) => ProductDetailScreen(product: product)));
             },
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -34,9 +27,7 @@ class ProductItem extends StatelessWidget {
               children: [
                 Flexible(
                   flex: 3,
-                  child: Container(
-                      margin: EdgeInsets.only(right: 20),
-                      child: Image.network(imageUrl)),
+                  child: Container(margin: const EdgeInsets.only(right: 20), child: Image.network(product.imageUrl)),
                 ),
                 Flexible(
                   fit: FlexFit.tight,
@@ -45,27 +36,27 @@ class ProductItem extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(
+                      const SizedBox(
                         height: 15,
                       ),
                       Text(
-                        title,
-                        style: TextStyle(
+                        product.title,
+                        style: const TextStyle(
                           fontSize: 17,
                         ),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 8.0,
                       ),
                       Text(
-                        description,
-                        style: TextStyle(
+                        product.description,
+                        style: const TextStyle(
                           color: Colors.grey,
                           fontSize: 14,
                         ),
                         maxLines: 7,
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 18,
                       ),
                       Container(
@@ -81,12 +72,8 @@ class ProductItem extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              '$price ₽',
-                              style: TextStyle(
-                                  color: Colors.orange.shade800,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  fontFamily: 'Comic Sans'),
+                              '${product.price} ₽',
+                              style: TextStyle(color: Colors.orange.shade800, fontWeight: FontWeight.bold, fontSize: 16, fontFamily: 'Comic Sans'),
                             ),
                           ],
                         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:parma_pizza/extensions/logger.dart';
 
 class CartItem {
   final String id;
@@ -9,13 +10,7 @@ class CartItem {
   final String imageUrl;
   final String productId;
 
-  CartItem(
-      {@required this.id,
-      @required this.title,
-      @required this.quantity,
-      @required this.price,
-      @required this.imageUrl,
-      @required this.productId});
+  CartItem({required this.id, required this.title, required this.quantity, required this.price, required this.imageUrl, required this.productId});
 }
 
 class Cart with ChangeNotifier {
@@ -89,7 +84,7 @@ class Cart with ChangeNotifier {
     if (!_items.containsKey(productId)) {
       return;
     }
-    if (_items[productId].quantity > 1) {
+    if (_items[productId]!.quantity > 1) {
       _items.update(
           productId,
           (existingCartItem) => CartItem(
@@ -105,14 +100,6 @@ class Cart with ChangeNotifier {
     }
     notifyListeners();
   }
-
-  // void sendOrder(Product product) {
-  //   const url =
-  //       'https://parma-pizza-a83bd-default-rtdb.europe-west1.firebasedatabase.app/orders.json';
-  //   http.post(url, body: json.encode({
-  //     'items':
-  //   }));
-  // }
 
   void clear() {
     _items = {};
@@ -147,10 +134,8 @@ class Cart with ChangeNotifier {
           "payment": payment,
         },
       );
-      print("Заказ успешно отправлен");
-      print(items);
     } catch (e) {
-      print(e);
+      Logger.log(e.toString());
     }
 
     notifyListeners();
