@@ -2,7 +2,7 @@
     package="ru.parma.parma_pizza">
     <uses-permission android:name="android.permission.INTERNET"/>
    <application
-        android:label="Parma Pizza"
+        android:label="Парма Пицца"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
